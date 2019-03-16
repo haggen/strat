@@ -1,0 +1,44 @@
+.toolbar {
+  position: absolute;
+  z-index: 10;
+  right: 0;
+  top: 0;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar > * + * {
+  margin-left: 0.75rem;
+}
+
+button {
+  border-radius: 2px;
+  border: 1px outset;
+  background-color: gainsboro;
+  padding: 0 0.75rem;
+}
+
+button:active {
+  border: 1px inset;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    0deg,
+    transparent 45%,
+    gray 45%,
+    gray 55%,
+    transparent 55%
+  );
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border-radius: 50%;
+  border: 1px outset;
+  background-color: gainsboro;
+  width: 1rem;
+  height: 1rem;
+}

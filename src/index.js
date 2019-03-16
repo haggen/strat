@@ -25,8 +25,8 @@ const state = {
   clients: {
     [clientId]: {
       id: clientId,
-      color: "black",
-      width: 1,
+      color: "#000000",
+      width: 2,
       strokes: []
     }
   }
@@ -63,20 +63,23 @@ function update() {
 
     for (let i = 0; i < client.strokes.length; i++) {
       const stroke = client.strokes[i];
-      if (stroke.length < 6) continue;
+      if (stroke.length < 8) continue;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.lineWidth = client.width;
-      ctx.strokeStyle = client.color;
-      ctx.shadowBlur = client.width * 2;
-      ctx.shadowColor = client.color;
+      ctx.strokeStyle = client.color + "99";
       ctx.beginPath();
       ctx.moveTo(...stroke.slice(0, 2));
-      for (let j = 2; j < stroke.length - 2; j += 2) {
+      for (let j = 2; j < stroke.length - 2; j += 4) {
         ctx.quadraticCurveTo(
           ...stroke.slice(j, j + 2),
           ...stroke.slice(j + 2, j + 4)
         );
+        if (j > 6)
+          ctx.quadraticCurveTo(
+            ...stroke.slice(j - 4, j - 2),
+            ...stroke.slice(j - 6, j - 3)
+          );
       }
       ctx.lineTo(...stroke.slice(-2));
       ctx.stroke();
@@ -139,21 +142,27 @@ canvas.addEventListener("mousewheel", e => {
     state.viewPort.scale -= state.viewPort.scale * 0.1;
   }
 
+  const horizontalGravity = 0.5; // state.ui.lastMousePosition[0] / state.viewPort.width;
+  const verticalGravity = 0.5; // state.ui.lastMousePosition[1] / state.viewPort.height;
+
   state.viewPort.x +=
     (state.viewPort.width / state.viewPort.scale -
       state.viewPort.width / previousScale) *
-    (state.ui.lastMousePosition[0] / state.viewPort.width);
+    horizontalGravity;
 
   state.viewPort.y +=
     (state.viewPort.height / state.viewPort.scale -
       state.viewPort.height / previousScale) *
-    (state.ui.lastMousePosition[1] / state.viewPort.height);
+    verticalGravity;
 
   e.preventDefault();
 });
 
 window.addEventListener("keydown", e => {
   if (e.code === "Space") state.ui.grabIsLocked = false;
+  if (e.code === "KeyZ" && (e.ctrlKey || e.metaKey)) {
+    state.clients[clientId].strokes.pop();
+  }
 });
 
 window.addEventListener("keyup", e => {
@@ -196,7 +205,7 @@ document.body.appendChild(toolbar);
 const widthSlider = document.createElement("input");
 widthSlider.type = "range";
 widthSlider.value = state.clients[clientId].width;
-widthSlider.min = 1;
+widthSlider.min = 2;
 widthSlider.max = 4;
 widthSlider.step = 1;
 widthSlider.addEventListener("change", e => {
